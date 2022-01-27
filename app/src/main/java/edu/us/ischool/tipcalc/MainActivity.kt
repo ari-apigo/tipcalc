@@ -30,19 +30,37 @@ class MainActivity : AppCompatActivity() {
 
         val btnTip = findViewById<Button>(R.id.btnTip)
 
+        var current = ""
+
         editTextAmount.addTextChangedListener(object: TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
 
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val stringText = s.toString()
+
+                if(stringText != current) {
+                    editTextAmount.removeTextChangedListener(this)
+
+                    val locale: Locale = Locale.US
+                    val currency = Currency.getInstance(locale)
+                    val cleanString = stringText.replace("[${currency.symbol},.]".toRegex(), "")
+                    val parsed = cleanString.toDouble()
+                    val formatted = NumberFormat.getCurrencyInstance(locale).format(parsed / 100)
+
+                    current = formatted
+                    editTextAmount.setText(formatted)
+                    editTextAmount.setSelection(formatted.length)
+                    editTextAmount.addTextChangedListener(this)
+                }
             }
 
             override fun afterTextChanged(s: Editable) {
                 // format editText as currency
-                NumberFormat.getCurrencyInstance()
-                var currentString = s.toString()
-                var currentDouble = NumberFormat.getCurrencyInstance().parse(currentString).toDouble()
-                var formatted = NumberFormat.getCurrencyInstance().format(currentDouble)
+//                NumberFormat.getCurrencyInstance()
+//                var currentString = s.toString()
+//                var currentDouble = NumberFormat.getCurrencyInstance().parse(currentString).toDouble()
+//                var formatted = NumberFormat.getCurrencyInstance().format(currentDouble)
 //                editTextAmount.setText(formatted)
 
                 if (!btnTip.isEnabled) {
